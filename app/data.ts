@@ -56,5 +56,13 @@ export const commands = [
 
             console.log(`${argCommand}: not found`);
         }
+    },
+    {
+        description: 'Print current working directory',
+        command: 'pwd',
+        args: [],
+        run: async (args: string[]) => {
+            console.log(process.cwd())
+        }
     }
 ];
