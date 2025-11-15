@@ -3,11 +3,16 @@
 # Kullanıcıdan commit mesajını al
 read -p "Commit mesajını girin: " message
 
-# git add . komutunu çalıştır
+# Tüm değişiklikleri ekle
 git add .
 
-# git commit --allow-empty komutunu çalıştır
+# Commit oluştur (değişiklik yoksa --allow-empty ile boş commit oluştur)
 git commit --allow-empty -m "$message"
 
-# git push origin master komutunu çalıştır
+# Codecrafters repo'suna push
 git push origin master
+
+# Kendi repoya push
+git push myrepo master
+
+echo "Push işlemi tamamlandı: hem Codecrafters hem kendi repoya gönderildi."
