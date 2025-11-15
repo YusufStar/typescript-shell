@@ -28,13 +28,16 @@ function ask() {
     rl.question("$ ", (input) => {
         const [commandText, ...commandArgs] = input.split(" "); // exit 0 -> command = exit, commandArgs = [0]
 
-        const find_command = commands.filter((data) => data.command === commandText)[0]
-        if (!find_command) {
+        const find_result = commands.filter((data) => data.command === commandText)
+        
+        if (find_result.length === 0) {
             console.log(`${input}: command not found`)
-        }
+        } else {
+            const find_command = find_result[0];
 
-        const {run, command, args, description} = find_command;
-        run(commandArgs)
+            const {run, command, args, description} = find_command;
+            run(commandArgs)
+        }
 
         ask()
     });
