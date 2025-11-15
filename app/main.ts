@@ -10,8 +10,6 @@ const commands: string[] = [
 
 // TODO: Uncomment the code below to pass the first stage
 rl.question("$ ", (command) => {
-    console.log(command);
-
     const available_command = commands.find((v) => v === command);
     if (!available_command) {
         console.log(`${command}: command not found`)
