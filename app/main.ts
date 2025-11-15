@@ -5,9 +5,17 @@ const rl = createInterface({
   output: process.stdout,
 });
 
+const commands: string[] = [
+]
+
 // TODO: Uncomment the code below to pass the first stage
-rl.question("$ ", (answer) => {
-    console.log(answer);
+rl.question("$ ", (command) => {
+    console.log(command);
+
+    const available_command = commands.find((v) => v === command);
+    if (!available_command) {
+        console.log(`${command}: command not found`)
+    }
 
    rl.close();
 });
