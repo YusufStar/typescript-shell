@@ -1,19 +1,24 @@
-import { createInterface } from "readline";
+import {createInterface} from "readline";
 
 const rl = createInterface({
-  input: process.stdin,
-  output: process.stdout,
+    input: process.stdin,
+    output: process.stdout,
 });
 
-const commands: string[] = [
-]
+const commands: {
+    description: string;
+    command: string;
+}[] = []
 
-// TODO: Uncomment the code below to pass the first stage
-rl.question("$ ", (command) => {
-    const available_command = commands.find((v) => v === command);
-    if (!available_command) {
-        console.log(`${command}: command not found`)
-    }
+function ask() {
+    rl.question("$ ", (command) => {
+        const available_command = commands.find((data) => data.command === command);
+        if (!available_command) {
+            console.log(`${command}: command not found`)
+        }
 
-   rl.close();
-});
+        ask()
+    });
+}
+
+ask();
