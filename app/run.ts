@@ -13,13 +13,7 @@ export async function runExit(args: string[]) {
 
 // echo (echo 'hello' 'world')
 export async function runEcho(args: string[]) {
-    const text = args.join(' ');
-    const splitted = text.split('\\n');
-    for (let i = 0; i < splitted.length; i++) {
-        if (i > 0) console.log();
-        process.stdout.write(splitted[i]);
-    }
-    console.log();
+    console.log(args.join(' '));
 }
 
 // type
