@@ -16,9 +16,27 @@ function ask() {
             let currentArg = "";
             let inSingleQuote = false;
             let inDoubleQuote = false;
+            let escaping = false;
 
             for (let i = 0; i < input.length; i++) {
                 const ch = input[i];
+
+                if (escaping) {
+                    currentArg += ch;
+                    escaping = false;
+                    continue;
+                }
+
+                if (ch === "\\") {
+                    if (inSingleQuote) {
+                        // Backslash is literal in single quotes
+                        currentArg += ch;
+                    } else {
+                        // Escape next character
+                        escaping = true;
+                    }
+                    continue;
+                }
 
                 if (ch === "'" && !inDoubleQuote) {
                     inSingleQuote = !inSingleQuote;
