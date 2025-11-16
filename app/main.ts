@@ -28,11 +28,9 @@ function ask() {
                 }
 
                 if (ch === "\\") {
-                    if (inSingleQuote) {
-                        // Backslash is literal in single quotes
+                    if (inSingleQuote || inDoubleQuote) {
                         currentArg += ch;
                     } else {
-                        // Escape next character
                         escaping = true;
                     }
                     continue;
