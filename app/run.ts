@@ -1,7 +1,7 @@
 import { access } from "fs/promises";
 import { constants } from "fs";
 import { isAbsolute, join } from "path";
-import { commands } from "./data";
+import { commands, customCommands } from "./data";
 import os from "os";
 
 // exit
@@ -11,9 +11,15 @@ export async function runExit(args: string[]) {
     process.exit(exitCode);
 }
 
-// echo
+// echo (echo 'hello' 'world')
 export async function runEcho(args: string[]) {
-    console.log(args.join(" "));
+    const text = args.join(' ');
+    const splitted = text.split('\\n');
+    for (let i = 0; i < splitted.length; i++) {
+        if (i > 0) console.log();
+        process.stdout.write(splitted[i]);
+    }
+    console.log();
 }
 
 // type
@@ -22,7 +28,7 @@ export async function runType(args: string[]) {
     if (typeof argCommand !== 'string') return;
 
     const builtin = commands.find(c => c.command === argCommand);
-    if (builtin) {
+    if (builtin && !customCommands.includes(argCommand)) {
         console.log(`${argCommand} is a shell builtin`);
         return;
     }
@@ -63,5 +69,19 @@ export async function runCd(args: string[]) {
         process.chdir(path);
     } catch {
         console.log(`cd: ${args[0]}: No such file or directory`);
+    }
+}
+
+// cat
+export async function runCat(args: string[]) {
+    const fs = await import('fs/promises');
+
+    for (const filePath of args) {
+        try {
+            const data = await fs.readFile(filePath, 'utf-8');
+            process.stdout.write(data);
+        } catch {
+            console.log(`cat: ${filePath}: No such file or directory`);
+        }
     }
 }

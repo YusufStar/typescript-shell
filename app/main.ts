@@ -1,5 +1,5 @@
 import { createInterface } from "readline";
-import { commands } from "./data.ts";
+import { commands, customCommands } from "./data.ts";
 import { spawn } from "child_process";
 import { findExecutable } from "./utils.ts";
 
@@ -10,7 +10,56 @@ const rl = createInterface({
 
 function ask() {
     rl.question("$ ", async (input) => {
-        const [commandText, ...commandArgs] = input.split(" ").filter(Boolean);
+
+        function parseArgs(input: string): string[] {
+            const args: string[] = [];
+            let currentArg = "";
+            let inQuote = false;
+
+            for (let i = 0; i < input.length; i++) {
+                const ch = input[i];
+
+                if (ch === "'") {
+                    inQuote = !inQuote;
+                    continue;
+                }
+
+                if (ch === " " && !inQuote) {
+                    if (currentArg.length > 0) {
+                        args.push(currentArg);
+                        currentArg = "";
+                    }
+                    continue;
+                }
+
+                currentArg += ch;
+            }
+
+            if (currentArg.length > 0) {
+                args.push(currentArg);
+            }
+
+            return args.filter(a => a.length > 0);
+        }
+
+        const parsedArgs = parseArgs(input);
+        const commandText = parsedArgs[0] || "";
+        const commandArgs = parsedArgs.slice(1);
+
+        if (customCommands.includes(commandText)) {
+            const builtin = commands.find(c => c.command === commandText);
+            if (builtin) {
+                try {
+                    await builtin.run(commandArgs);
+                } catch (err) {
+                    console.log("Command error:", err);
+                }
+            } else {
+                console.log(`${commandText}: not found`);
+            }
+            ask();
+            return;
+        }
 
         const builtin = commands.find(c => c.command === commandText);
         if (builtin) {
