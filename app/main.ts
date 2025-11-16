@@ -28,8 +28,22 @@ function ask() {
                 }
 
                 if (ch === "\\") {
-                    if (inSingleQuote || inDoubleQuote) {
+                    if (inSingleQuote) {
                         currentArg += ch;
+                    } else if (inDoubleQuote) {
+                        const nextChar = input[i + 1];
+                        if (nextChar && (nextChar === "\\" || nextChar === '"' || nextChar === "$" || nextChar === "`" || nextChar === "\n")) {
+                            currentArg += nextChar === "\n" ? "" : nextChar;
+                            if (nextChar !== "\n") {
+                                i++;
+                            } else {
+                                while (i + 1 < input.length && (input[i + 1] === "\n" || input[i + 1] === "\r")) {
+                                    i++;
+                                }
+                            }
+                        } else {
+                            currentArg += ch;
+                        }
                     } else {
                         escaping = true;
                     }
