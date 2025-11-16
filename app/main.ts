@@ -14,17 +14,23 @@ function ask() {
         function parseArgs(input: string): string[] {
             const args: string[] = [];
             let currentArg = "";
-            let inQuote = false;
+            let inSingleQuote = false;
+            let inDoubleQuote = false;
 
             for (let i = 0; i < input.length; i++) {
                 const ch = input[i];
 
-                if (ch === "'") {
-                    inQuote = !inQuote;
+                if (ch === "'" && !inDoubleQuote) {
+                    inSingleQuote = !inSingleQuote;
                     continue;
                 }
 
-                if (ch === " " && !inQuote) {
+                if (ch === '"' && !inSingleQuote) {
+                    inDoubleQuote = !inDoubleQuote;
+                    continue;
+                }
+
+                if (ch === " " && !inSingleQuote && !inDoubleQuote) {
                     if (currentArg.length > 0) {
                         args.push(currentArg);
                         currentArg = "";
