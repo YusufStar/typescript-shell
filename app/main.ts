@@ -3,13 +3,29 @@ import { commands, customCommands } from "./data.ts";
 import { spawn } from "child_process";
 import { findExecutable } from "./utils.ts";
 import { createWriteStream } from "fs";
+import { mkdir } from "fs/promises";
+import { dirname } from "path";
+import { Console } from "console";
 
 const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
 });
 
+async function ensureParentDir(filePath: string) {
+    const dir = dirname(filePath);
+    if (!dir || dir === "." || dir === "") return;
+    try {
+        await mkdir(dir, { recursive: true });
+    } catch (err) {
+        if ((err as NodeJS.ErrnoException).code !== "EEXIST") {
+            throw err;
+        }
+    }
+}
+
 async function withStdoutRedirection(path: string, handler: () => Promise<void>) {
+    await ensureParentDir(path);
     return new Promise<void>((resolve, reject) => {
         let stream;
         try {
@@ -20,9 +36,13 @@ async function withStdoutRedirection(path: string, handler: () => Promise<void>)
         }
 
         const originalWrite = process.stdout.write;
+        const originalConsoleLog = console.log;
+        const originalConsoleInfo = console.info;
 
         const restore = () => {
             process.stdout.write = originalWrite;
+            console.log = originalConsoleLog;
+            console.info = originalConsoleInfo;
         };
 
         const finalize = (cb: () => void) => {
@@ -42,6 +62,10 @@ async function withStdoutRedirection(path: string, handler: () => Promise<void>)
         process.stdout.write = ((chunk: any, encoding?: any, callback?: any) => {
             return stream.write(chunk, encoding as any, callback);
         }) as typeof process.stdout.write;
+
+        const redirectedConsole = new Console(stream, process.stderr);
+        console.log = redirectedConsole.log.bind(redirectedConsole);
+        console.info = redirectedConsole.info.bind(redirectedConsole);
 
         handler()
             .then(() => {
@@ -197,6 +221,7 @@ function ask() {
             if (outputRedirectPath) {
                 let stdoutStream;
                 try {
+                    await ensureParentDir(outputRedirectPath);
                     stdoutStream = createWriteStream(outputRedirectPath, { flags: "w" });
                 } catch (err) {
                     console.log("Command error:", err);

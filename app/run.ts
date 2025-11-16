@@ -75,7 +75,7 @@ export async function runCat(args: string[]) {
             const data = await fs.readFile(filePath, 'utf-8');
             process.stdout.write(data);
         } catch {
-            console.log(`cat: ${filePath}: No such file or directory`);
+            console.error(`cat: ${filePath}: No such file or directory`);
         }
     }
 }
